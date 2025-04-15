@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Consulta de IMEI Grátis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        pre.logs {
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        #messageBox {
+            display: none;
+        }
+        #adminPanel {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-dark text-white text-center">
+                        <h3>Painel Administrativo - Consulta de IMEI Grátis</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="messageBox" class="alert alert-dismissible fade show">
+                            <span id="messageText">Mensagem aparecerá aqui</span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                        </div>
+                        
+                        <!-- Formulário de Login -->
+                        <div id="loginForm" class="row justify-content-center">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white text-center">
+                                        <h5>Login</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="formLogin">
+                                            <div class="mb-3">
+                                                <label for="usuario" class="form-label">Usuário:</label>
+                                                <input type="text" name="usuario" id="usuario" class="form-control" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="senha" class="form-label">Senha:</label>
+                                                <input type="password" name="senha" id="senha" class="form-control" required>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary">Entrar</button>
+                                            </div>
+                                        </form>
+                                        <div class="mt-3 text-center">
+                                            <small class="text-muted">Use admin/admin123 para entrar</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Painel Administrativo -->
+                        <div id="adminPanel">
+                            <div class="row mb-4">
+                                <div class="col-md-12 text-end">
+                                    <button id="btnLogout" class="btn btn-outline-danger btn-sm">
+                                        <i class="bi bi-box-arrow-right"></i> Sair
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h5 class="card-title">12</h5>
+                                            <p class="card-text">Arquivos em Cache</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h5 class="card-title">145 KB</h5>
+                                            <p class="card-text">Tamanho do Cache</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h5 class="card-title">78 KB</h5>
+                                            <p class="card-text">Tamanho dos Logs</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card text-center">
+                                        <div class="card-body">
+                                            <h5 class="card-title">10/06/2023 14:30</h5>
+                                            <p class="card-text">Última Consulta</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Ferramentas administrativas -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5>Gerenciamento de Cache</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <button id="btnLimparCache" class="btn btn-danger mb-3">Limpar Todo o Cache</button>
+                                            
+                                            <hr>
+                                            
+                                            <h6>Limpar Cache de IMEI Específico</h6>
+                                            <form id="formLimparIMEI">
+                                                <div class="mb-3">
+                                                    <label for="service_cache" class="form-label">Serviço:</label>
+                                                    <select name="service" id="service_cache" class="form-select">
+                                                        <option value="1">Check Service 1</option>
+                                                        <option value="2">Check Service 2</option>
+                                                        <option value="3">Check Service 3</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="imei_cache" class="form-label">IMEI:</label>
+                                                    <input type="text" name="imei" id="imei_cache" class="form-control" 
+                                                           placeholder="Digite o IMEI (15 dígitos)" maxlength="15" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-warning">Limpar Cache do IMEI</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card">
+                                        <div class="card-header bg-info text-white">
+                                            <h5>Logs do Sistema</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <button id="btnLimparLogs" class="btn btn-danger mb-3">Limpar Logs</button>
+                                            
+                                            <hr>
+                                            
+                                            <h6>Visualizar Logs</h6>
+                                            <pre class="logs" id="logsContent">2023-06-10 14:30:22 - Request: Array ( [service] => 1 [imei] => 123456789012345 [key] => AKS-TSG-DDA-TWH-2MY-7BW-W9E-SQ5 )
+2023-06-10 14:30:25 - Response: Success
+2023-06-10 15:12:45 - Request: Array ( [service] => 2 [imei] => 987654321098765 [key] => AKS-TSG-DDA-TWH-2MY-7BW-W9E-SQ5 )
+2023-06-10 15:12:48 - Response: Success
+2023-06-10 16:30:01 - Request: Array ( [service] => 1 [imei] => 555555555555555 [key] => AKS-TSG-DDA-TWH-2MY-7BW-W9E-SQ5 )
+2023-06-10 16:30:03 - Erro: Dispositivo bloqueado
+2023-06-11 09:15:30 - Request: Array ( [service] => 3 [imei] => 111122223333444 [key] => AKS-TSG-DDA-TWH-2MY-7BW-W9E-SQ5 )
+2023-06-11 09:15:35 - Response: Success</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <a href="index.html" class="btn btn-outline-primary">Voltar para a Página Principal</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; <span id="currentYear">2023</span> Consulta IMEI Grátis. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Atualizar o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // Validação do campo IMEI
+        document.getElementById('imei_cache').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').substring(0, 15);
+        });
+        
+        // Processar login
+        document.getElementById('formLogin').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+            
+            if (usuario === 'admin' && senha === 'admin123') {
+                // Login bem-sucedido
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                showMessage('Login realizado com sucesso!', 'success');
+            } else {
+                // Login falhou
+                showMessage('Usuário ou senha incorretos!', 'danger');
+            }
+        });
+        
+        // Logout
+        document.getElementById('btnLogout').addEventListener('click', function() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('usuario').value = '';
+            document.getElementById('senha').value = '';
+            showMessage('Sessão encerrada com sucesso!', 'success');
+        });
+        
+        // Limpar todo o cache
+        document.getElementById('btnLimparCache').addEventListener('click', function() {
+            showMessage('Cache limpo com sucesso! 12 arquivo(s) removido(s).', 'success');
+        });
+        
+        // Limpar cache de IMEI específico
+        document.getElementById('formLimparIMEI').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const imei = document.getElementById('imei_cache').value;
+            const service = document.getElementById('service_cache').value;
+            
+            if (!imei) {
+                showMessage('Por favor, informe o IMEI para limpar o cache.', 'warning');
+                return;
+            }
+            
+            if (!/^[0-9]{15}$/.test(imei)) {
+                showMessage('IMEI inválido. O IMEI deve conter exatamente 15 dígitos numéricos.', 'warning');
+                return;
+            }
+            
+            showMessage(`Cache para IMEI ${imei} (Serviço ${service}) limpo com sucesso!`, 'success');
+        });
+        
+        // Limpar logs
+        document.getElementById('btnLimparLogs').addEventListener('click', function() {
+            document.getElementById('logsContent').textContent = 'Nenhum log encontrado.';
+            showMessage('Logs limpos com sucesso!', 'success');
+        });
+        
+        // Função para mostrar mensagens
+        function showMessage(message, type) {
+            const messageBox = document.getElementById('messageBox');
+            const messageText = document.getElementById('messageText');
+            
+            messageBox.className = `alert alert-${type} alert-dismissible fade show`;
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+            
+            // Esconder a mensagem após 5 segundos
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de IMEI Grátis</title>
+    <meta name="description" content="Consulte informações sobre seu dispositivo móvel através do IMEI gratuitamente.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 20px;
+        }
+        .card {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .result-box {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+        .header-img {
+            max-height: 150px;
+            margin: 20px auto;
+            display: block;
+        }
+        #errorMessage {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h3>Consulta de IMEI Grátis</h3>
+                    </div>
+                    <div class="card-body">
+                        <img src="https://via.placeholder.com/500x150?text=Consulta+IMEI" alt="Consulta IMEI" class="header-img img-fluid">
+                        
+                        <div id="errorMessage" class="alert alert-danger">
+                            Mensagem de erro aparecerá aqui
+                        </div>
+                        
+                        <form id="consultaForm" class="mt-4">
+                            <div class="mb-3">
+                                <label for="service" class="form-label">Serviço:</label>
+                                <select name="service" id="service" class="form-select">
+                                    <option value="1">Check Service 1</option>
+                                    <option value="2">Check Service 2</option>
+                                    <option value="3">Check Service 3</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="imei" class="form-label">IMEI do Dispositivo:</label>
+                                <input type="text" name="imei" id="imei" 
+                                       class="form-control" 
+                                       placeholder="Digite o IMEI (15 dígitos)" 
+                                       maxlength="15"
+                                       required>
+                                <div class="form-text">O IMEI deve conter exatamente 15 dígitos numéricos.</div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Consultar IMEI</button>
+                            </div>
+                        </form>
+                        
+                        <div id="resultBox" class="result-box mt-4">
+                            <h4>Resultado da Consulta:</h4>
+                            
+                            <div id="responseMessage" class="alert alert-success">
+                                A consulta foi realizada com sucesso!
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    Detalhes do Dispositivo
+                                </div>
+                                <div class="card-body">
+                                    <pre id="deviceDetails">
+Modelo: iPhone 11 Pro
+IMEI: 123456789012345
+Status: Limpo
+Bloqueio: Desbloqueado
+Rede: Livre
+Data de Produção: 01/05/2020
+Cor: Preto
+Capacidade: 64GB
+                                    </pre>
+                                    
+                                    <p><strong>Modelo:</strong> <span id="deviceModel">iPhone 11 Pro</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h4>Como encontrar seu IMEI</h4>
+                    </div>
+                    <div class="card-body">
+                        <p>Existem várias maneiras de encontrar o IMEI do seu dispositivo:</p>
+                        <ul>
+                            <li>Disque <strong>*#06#</strong> no teclado do seu telefone</li>
+                            <li>Em iPhones: Configurações > Geral > Sobre</li>
+                            <li>Em Android: Configurações > Sobre o telefone > Status > Informações do IMEI</li>
+                            <li>Verifique na caixa original do dispositivo</li>
+                            <li>Verifique na parte traseira da bateria (dispositivos com bateria removível)</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Link para o painel de administração -->
+                <div class="text-center mt-3">
+                    <a href="admin.html" class="btn btn-sm btn-outline-secondary">Painel de Administração</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; <span id="currentYear">2023</span> Consulta IMEI Grátis. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Atualizar o ano atual no rodapé
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // Validação do campo IMEI no lado do cliente
+        document.getElementById('imei').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').substring(0, 15);
+        });
+        
+        // Processar o formulário
+        document.getElementById('consultaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const imei = document.getElementById('imei').value;
+            const service = document.getElementById('service').value;
+            
+            // Validação básica
+            if (!imei) {
+                showError('Por favor, informe o IMEI do dispositivo.');
+                return;
+            }
+            
+            if (!/^[0-9]{15}$/.test(imei)) {
+                showError('IMEI inválido. O IMEI deve conter exatamente 15 dígitos numéricos.');
+                return;
+            }
+            
+            // Simular consulta (em uma versão real, isto seria uma requisição AJAX)
+            simulateQuery(imei, service);
+        });
+        
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Esconder o resultado se estiver visível
+            document.getElementById('resultBox').style.display = 'none';
+            
+            // Esconder a mensagem após 5 segundos
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function simulateQuery(imei, service) {
+            // Esconder mensagens de erro
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            // Mostrar uma mensagem de "carregando"
+            const resultBox = document.getElementById('resultBox');
+            resultBox.style.display = 'block';
+            document.getElementById('responseMessage').innerHTML = 'Consultando IMEI, aguarde...';
+            
+            // Simular um atraso de rede
+            setTimeout(() => {
+                // Gerar dados aleatórios para demonstração
+                const deviceTypes = ['iPhone', 'Samsung Galaxy', 'Xiaomi', 'Motorola', 'Huawei'];
+                const models = ['SE', '11', '12 Pro', 'S21', 'Note 20', 'Mi 11', 'Edge', 'P40'];
+                const colors = ['Preto', 'Branco', 'Azul', 'Verde', 'Vermelho', 'Dourado'];
+                const capacities = ['32GB', '64GB', '128GB', '256GB', '512GB'];
+                const status = ['Limpo', 'Bloqueado', 'Roubado', 'Perdido'];
+                
+                // Selecionar valores aleatórios
+                const deviceType = deviceTypes[Math.floor(Math.random() * deviceTypes.length)];
+                const model = models[Math.floor(Math.random() * models.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const capacity = capacities[Math.floor(Math.random() * capacities.length)];
+                const deviceStatus = status[Math.floor(Math.random() * status.length)];
+                
+                // Atualizar os elementos HTML
+                document.getElementById('deviceModel').textContent = `${deviceType} ${model}`;
+                
+                // Atualizar os detalhes do dispositivo
+                document.getElementById('deviceDetails').textContent = 
+`Modelo: ${deviceType} ${model}
+IMEI: ${imei}
+Status: ${deviceStatus}
+Bloqueio: ${deviceStatus === 'Limpo' ? 'Desbloqueado' : 'Bloqueado'}
+Rede: ${Math.random() > 0.5 ? 'Livre' : 'Bloqueada para operadora original'}
+Data de Produção: ${Math.floor(Math.random() * 28) + 1}/${Math.floor(Math.random() * 12) + 1}/${2018 + Math.floor(Math.random() * 5)}
+Cor: ${color}
+Capacidade: ${capacity}`;
+                
+                // Atualizar a mensagem de resposta
+                document.getElementById('responseMessage').innerHTML = `A consulta para o IMEI ${imei} foi realizada com sucesso!`;
+                
+                // Se for um status ruim, mudar a cor
+                if (deviceStatus !== 'Limpo') {
+                    document.getElementById('responseMessage').className = 'alert alert-warning';
+                } else {
+                    document.getElementById('responseMessage').className = 'alert alert-success';
+                }
+                
+            }, 2000); // 2 segundos de atraso
+        }
+    </script>
+</body>
+</html> 
